@@ -70,7 +70,7 @@ def withdraw():
         account_number = int(request.form['account_number'])
         value = int(request.form['value'])
         new_balance = bank1.make_withdraw(account_number, value)
-        db.update_balance_db(new_balance, account_number)
+        db.update_balance_db(mysql, new_balance, account_number)
 
         return f'The value of {value} was withdrawn from the account number {account_number}'
     except ValueError:
@@ -119,7 +119,7 @@ def delete_account():
         return 'Invalid account number'
 
 
-@app.route("/all_accounts", methods=['POST'])
+@app.route("/all_accounts", methods=['GET'])
 def show_all_accounts():
     result = db.select_accounts(mysql)
     return render_template('accounts.html', result=result)
