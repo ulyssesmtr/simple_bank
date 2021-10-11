@@ -11,7 +11,7 @@ def load_base():
     account_list = db.select_accounts(mysql)
     for account in account_list:
         acc = bank1.create_account(account[0])  # Create the account using the number on the db
-        acc.deposit(account[1])  # Update the account balance with the value present on the db
+        acc.deposit(account[1])  # Update the account balance with the value stored on the db
 
 
 with app.app_context():
@@ -54,6 +54,8 @@ def deposit():
     try:
         account_number = int(request.form['account_number'])
         value = int(request.form['value'])
+        if value <= 0:
+            return "You cant deposit a value less or equal to 0"
         new_balance = bank1.make_deposit(account_number, value)
         db.update_balance_db(mysql, new_balance, account_number)
 
@@ -73,6 +75,9 @@ def withdraw():
     try:
         account_number = int(request.form['account_number'])
         value = int(request.form['value'])
+        account_balance = bank1.show_balance(account_number)
+        if account_balance < value or value <= 0:
+            return 'You cannot withdraw more than the accounts balance, or a quantity less or equal to 0'
         new_balance = bank1.make_withdraw(account_number, value)
         db.update_balance_db(mysql, new_balance, account_number)
 
@@ -93,6 +98,9 @@ def transfer():
         account_number1 = int(request.form['account_number1'])
         account_number2 = int(request.form['account_number2'])
         value = int(request.form['value'])
+        account_balance = bank1.show_balance(account_number1)
+        if account_balance < value or value <= 0:
+            return 'You cannot transfer more than the accounts balance, or a quantity less or equal to 0'
         new_balance1, new_balance2 = bank1.transfer(account_number1, account_number2, value)
         db.update_balance_db(mysql, new_balance1, account_number1)
         db.update_balance_db(mysql, new_balance2, account_number2)
